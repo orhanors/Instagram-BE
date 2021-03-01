@@ -1,4 +1,4 @@
-exports.badRequestHandler = (err, req, res, next) => {
+const badRequestHandler = (err, req, res, next) => {
 	if (err.httpStatusCode === 400) {
 		res.status(400).json({
 			success: false,
@@ -8,7 +8,7 @@ exports.badRequestHandler = (err, req, res, next) => {
 	next(err);
 };
 
-exports.forbiddenError = (err, req, res, next) => {
+const forbiddenError = (err, req, res, next) => {
 	if (err.httpStatusCode === 403) {
 		res.status(400).json({
 			success: false,
@@ -18,7 +18,7 @@ exports.forbiddenError = (err, req, res, next) => {
 	next(err);
 };
 
-exports.notFoundHandler = (err, req, res, next) => {
+const notFoundHandler = (err, req, res, next) => {
 	if (err.httpStatusCode === 404) {
 		res.status(404).json({
 			success: false,
@@ -28,7 +28,7 @@ exports.notFoundHandler = (err, req, res, next) => {
 	next(err);
 };
 
-exports.unauthorizedError = (err, req, res, next) => {
+const unauthorizedError = (err, req, res, next) => {
 	if (err.httpStatusCode === 401) {
 		res.status(401).json({
 			success: false,
@@ -38,11 +38,19 @@ exports.unauthorizedError = (err, req, res, next) => {
 	next(err);
 };
 
-exports.genericErrorHandler = (err, req, res, next) => {
+const genericErrorHandler = (err, req, res, next) => {
 	if (!res.headersSent) {
 		res.status(err.httpStatusCode || 500).json({
 			success: false,
 			errors: err.message || "Internal Server Error",
 		});
 	}
+};
+
+module.exports = (server) => {
+	server.use(badRequestHandler);
+	server.use(notFoundHandler);
+	server.use(forbiddenError);
+	server.use(unauthorizedError);
+	server.use(genericErrorHandler);
 };

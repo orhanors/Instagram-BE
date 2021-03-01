@@ -8,6 +8,10 @@ const httpServer = http.createServer(server);
 server.use(express.json());
 server.use(cors());
 
+//Error handling
+
+require("./middlewares/errorHandling")(server);
+
 mongoose
 	.connect(MONGODB_URI, {
 		useCreateIndex: true,
