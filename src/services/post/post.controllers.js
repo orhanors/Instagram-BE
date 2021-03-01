@@ -24,6 +24,7 @@ exports.getSpecificPost = async (req, res, next) => {
 
 exports.getAllMyPosts = async (req, res, next) => {
 	try {
+        //stil pending
         console.log(req.user)
 		res.send("okej")
 	} catch (error) {
