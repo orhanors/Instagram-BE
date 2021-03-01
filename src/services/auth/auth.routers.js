@@ -11,6 +11,9 @@ const {
 
 authRouter.get("/refreshToken", refreshTokenHandler);
 authRouter.get("/logout", validateToken, logout);
+authRouter.get("/test", validateToken, (req, res) => {
+	res.send(req.user);
+});
 authRouter.post("/login", login);
 authRouter.post("/signup", signup);
 // GOOGLE

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcryp = require("bcrypt");
+const bcrypt = require("bcrypt");
 const userPlaceholderImg =
 	"https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
 

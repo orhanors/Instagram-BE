@@ -1,6 +1,7 @@
 const { handleRefreshToken } = require("../../utils/auth/jwt");
 const ApiError = require("../../utils/errors/ApiError");
 const { UserModel } = require("../user");
+const { generateTokens } = require("../../utils/auth/jwt");
 exports.refreshTokenHandler = async (req, res, next) => {
 	try {
 		const oldRefreshToken = req.cookies.refreshToken;
@@ -38,7 +39,8 @@ exports.login = async (req, res, next) => {
 		const { username, password } = req.body;
 		const user = await UserModel.findByCredentials(username, password);
 		if (!user) return next(new ApiError(400, "Invalid Credentials"));
-		res.status(201).send(user);
+		const tokens = await generateTokens(user);
+		res.status(200).send(tokens);
 	} catch (error) {
 		console.log("Login error: ", error);
 		next(error);

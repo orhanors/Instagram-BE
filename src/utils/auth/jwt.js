@@ -13,6 +13,7 @@ const generateTokens = async (user) => {
 		});
 
 		await user.save();
+
 		return { token: newAccessToken, refreshToken: newRefreshToken };
 	} catch (error) {
 		console.log("JWT authenticate error: ", error);
@@ -47,7 +48,7 @@ const handleRefreshToken = async (oldRefreshToken) => {
 
 const generateJWT = (payload) =>
 	new Promise((res, rej) => {
-		jwt.sign(payload, JWT_SECRET, { expiresIn: "10000" }, (err, token) => {
+		jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" }, (err, token) => {
 			if (err) rej(err);
 			res(token);
 		});
