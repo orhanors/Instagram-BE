@@ -24,7 +24,8 @@ exports.getSpecificPost = async (req, res, next) => {
 
 exports.getAllMyPosts = async (req, res, next) => {
 	try {
-		const myPost = await PostModel.findById;
+        console.log(req.user)
+		res.send("okej")
 	} catch (error) {
 		next(error);
 	}

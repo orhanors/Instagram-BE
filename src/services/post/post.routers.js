@@ -1,6 +1,6 @@
 const postRoute = require("express").Router()
 const cloudinaryMulter = require("../../middlewares/cloudinary")
-
+// const {validateToken} =  require("../../middlewares/validateToken")
 const {
     newPost,
     getAllMyPosts,

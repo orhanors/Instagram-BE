@@ -16,6 +16,7 @@ const validateToken = async (req, res, next) => {
 
 		req.token = token;
 		req.user = user;
+		console.log(req.token)
 		next();
 	} catch (e) {
 		next(new ApiError(401, "Unauthorized"));
