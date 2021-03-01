@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const http = require("http");
+const postRoute = require("./services/post/post.routers");
 const { PORT, MONGODB_URI } = process.env;
 const server = express();
 const httpServer = http.createServer(server);
