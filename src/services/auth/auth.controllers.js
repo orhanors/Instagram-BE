@@ -46,7 +46,7 @@ exports.login = async (req, res, next) => {
 			path: "/api/users/refreshToken",
 		});
 		res.cookie("isAuthUser", true);
-		res.status(200).send(tokens);
+		res.status(200).send("Ok");
 	} catch (error) {
 		console.log("Login error: ", error);
 		next(error);

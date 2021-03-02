@@ -9,7 +9,15 @@ const validateToken = async (req, res, next) => {
 		console.log("decoded is : ", decoded);
 		const user = await UserModel.findOne({
 			_id: decoded._id,
-		});
+		})
+			.populate({
+				path: "followers",
+				select: "-refreshTokens -__v -password",
+			})
+			.populate({
+				path: "following",
+				select: "-refreshTokens -__v -password",
+			});
 
 		if (!user) {
 			throw new ApiError(401, "Unauthorized");
