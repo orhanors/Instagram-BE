@@ -7,10 +7,11 @@ const validateToken = async (req, res, next) => {
 
 		if (!token) {
 			token = req.header("Authorization").replace("Bearer ", "");
+			if (!token) throw new ApiError(401);
 		}
-		console.log("token: ", token);
+
 		const decoded = await verifyJWT(token);
-		console.log("decoded: ", decoded);
+
 		const user = await UserModel.findOne({
 			_id: decoded._id,
 		});
@@ -21,7 +22,7 @@ const validateToken = async (req, res, next) => {
 
 		req.token = token;
 		req.user = user;
-		console.log(req.token)
+		console.log(req.token);
 		next();
 	} catch (e) {
 		next(e);
