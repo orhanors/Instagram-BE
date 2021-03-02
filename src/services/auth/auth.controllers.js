@@ -51,7 +51,7 @@ exports.signup = async (req, res, next) => {
 	try {
 		const { email, username } = req.body;
 		const foundUserwithEmail = await UserModel.findOne({ email });
-		const foundUserwithUsername = await UserModel.findOne({ email });
+		const foundUserwithUsername = await UserModel.findOne({ username });
 		if (foundUserwithUsername)
 			throw new ApiError(400, "Username already exist!");
 		if (foundUserwithEmail) throw new ApiError(400, "Email already exist!");
