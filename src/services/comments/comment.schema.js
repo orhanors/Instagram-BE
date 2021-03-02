@@ -1,4 +1,4 @@
-const { Schema } = require("mongoose")
+const { Schema,model } = require("mongoose")
 const mongoose = require("mongoose")
 
 const CommentSchema = new Schema(
@@ -11,6 +11,6 @@ const CommentSchema = new Schema(
     }
 )
 
-CommentModel= mongoose.model("Comments", CommentSchema)
+const CommentModel= mongoose.model("Comments", CommentSchema)
 
-module.exports = (CommentModel) 
+module.exports = CommentModel

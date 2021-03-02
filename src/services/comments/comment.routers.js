@@ -1,14 +1,14 @@
 const commentsRoute = require("express").Router()
 
-// const {validateToken} =  require("../../middlewares/validateToken")
+const {validateToken} =  require("../../middlewares/validateToken")
 const {
-    getComments
+    getComments, addComment
    
 }= require("./comment.controllers")
 
-commentsRoute.get("/:postId",getComments)
+commentsRoute.get("/:postId",validateToken,getComments)
 
-commentsRoute.post("/:postId/add")
+commentsRoute.post("/:postId/add",validateToken,addComment)
 
 commentsRoute.put("/:commentId")
 

@@ -1,6 +1,6 @@
 const CommentModel = require("./comment.schema")
 const PostModel = require("../post/post.schema")
-
+const ObjectId = require('mongodb').ObjectID;
 exports.getComments = async(req,res,next)=>{
     try {
         const comments = await CommentModel.find().populate("User")
@@ -23,14 +23,16 @@ exports.addComment = async(req,res,next)=>{
             user: req.user._id,
             ...req.body
         })
-        const {_id} = newComment.save()
+        const {_id} =await newComment.save()
+        console.log(req.params.postId,"here")
         await PostModel.findByIdAndUpdate(req.params.postId,{
             $push:{
                 comments:[{
-                    _id:_id
+                    _id:ObjectId(_id)
                 }]
             }
         })
+        console.log(_id,"whyyyy")
         if(_id){
             res.status(200).send("Created the id is :",_id)
         }else{
