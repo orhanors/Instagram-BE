@@ -105,7 +105,7 @@ exports.addLike = async(req,res,next)=>{
 		const findmyLike= await PostModel.findOne({_id:req.params.postId})
 		let liked=false
 		console.log(findmyLike,"asdsdas")
-		for(let i = 0;i<findmyLike.likes.length;i++){
+		 for(let i = 0;i<findmyLike.likes.length;i++){
 			if(findmyLike.likes[i]._id===req.user._id){
 				liked=true
 				
