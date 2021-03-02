@@ -23,7 +23,7 @@ exports.newPost = async (req, res, next) => {
 
 exports.getSpecificPost = async (req, res, next) => {
 	try {
-		const specificPost = await PostModel.findById(req.params.postId);
+		const specificPost = await PostModel.findById(req.params.postId).populate({path:"comments",populate:{path:"user"}}).populate("user");
 		res.status(200).send(specificPost);
 
 		console.log(specificPost);
@@ -35,7 +35,7 @@ exports.getSpecificPost = async (req, res, next) => {
 exports.getAllMyPosts = async (req, res, next) => {
 	try {
 		console.log(req.user._id)
-        const myPosts = await PostModel.find({user:req.user._id})
+        const myPosts = await PostModel.findOne({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
         console.log(myPosts,"asds")
 		res.send(myPosts)
 	} catch (error) {
@@ -48,10 +48,10 @@ exports.getAllPosts = async (req, res, next) => {
 		let allPosts = []
 		console.log(req.user.following,"here")
 		for(let i=0;i<req.user.following.length;i++){
-			const post = await PostModel.find({user:req.user.following[i]})
+			const post = await PostModel.find({user:req.user.following[i]}).populate("user").populate({path:"comments",populate:{path:"user"}})
 			allPosts.push(post)
 		}
-		const myPosts = await PostModel.find({user:req.user._id})
+		const myPosts = await PostModel.findOne({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
 		allPosts.push(myPosts)
 		//then find all the posts of them
 		// sort by date pending !!!!
