@@ -6,7 +6,7 @@ const validateToken = async (req, res, next) => {
 		let token = req.cookies.token;
 
 		const decoded = await verifyJWT(token);
-		console.log("decoded is : ", decoded);
+
 		const user = await UserModel.findOne({
 			_id: decoded._id,
 		})
@@ -25,7 +25,7 @@ const validateToken = async (req, res, next) => {
 
 		req.token = token;
 		req.user = user;
-		console.log(req.token);
+
 		next();
 	} catch (e) {
 		next(new ApiError(401, "Unauthorized"));

@@ -41,7 +41,6 @@ const addPostNotification = async (
 		postId: post._id,
 		like,
 		comment,
-
 		username: currentUser.username,
 	};
 

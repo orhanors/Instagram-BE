@@ -6,12 +6,13 @@ const services = require("./services");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
 const corsOptions = require("./utils/server/corsOptions");
+const createSocketServer = require("./web/socket");
 //👌 Initial Setup
 require("./middlewares/passport");
 const { PORT, MONGODB_URI } = process.env;
 const server = express();
 const httpServer = http.createServer(server);
-
+createSocketServer(httpServer);
 //👌 Middlewares
 server.use(express.json());
 server.use(cors(corsOptions));

@@ -41,7 +41,7 @@ exports.login = async (req, res, next) => {
 		if (!user) return next(new ApiError(400, "Invalid Credentials"));
 		const tokens = await generateTokens(user);
 		res.cookie("token", tokens.token, { httpOnly: true });
-		res.cookie("refreshToken", tokens.refreshToken, {
+		res.cookie("refreshTok5en", tokens.refreshToken, {
 			httpOnly: true,
 			path: "/api/users/refreshToken",
 		});
