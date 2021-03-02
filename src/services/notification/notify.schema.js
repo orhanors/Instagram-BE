@@ -13,7 +13,8 @@ const NotificationSchema = new mongoose.Schema({
 	],
 	posts: [
 		{
-			id: String,
+			userId: String,
+			postId: String,
 			like: Boolean,
 			comment: Boolean,
 			username: String,

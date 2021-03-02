@@ -1,33 +1,28 @@
-const postRoute = require("express").Router()
-const cloudinaryMulter = require("../../middlewares/cloudinary")
- const {validateToken} =  require("../../middlewares/validateToken")
+const postRoute = require("express").Router();
+const cloudinaryMulter = require("../../middlewares/cloudinary");
+const { validateToken } = require("../../middlewares/validateToken");
 const {
-    newPost,
-    getAllMyPosts,
-    getAllPosts,
-    getSpecificPost,
-    deletePost,
-    editSinglePost,
-    addLike,
-    removeLike
-}= require("./post.controllers")
+	newPost,
+	getAllMyPosts,
+	getAllPosts,
+	getSpecificPost,
+	deletePost,
+	editSinglePost,
+	handleLike,
+	removeLike,
+} = require("./post.controllers");
 
-postRoute.get("/all/me/posts",validateToken,getAllPosts)
-postRoute.get("/:postId",getSpecificPost)
+postRoute.get("/all/me/posts", validateToken, getAllPosts);
+postRoute.get("/:postId", getSpecificPost);
 
+postRoute.get("/all/me", validateToken, getAllMyPosts);
 
+postRoute.post("/:postId/like", validateToken, handleLike);
 
-postRoute.get("/all/me",validateToken,getAllMyPosts)
+postRoute.put("/:postId", cloudinaryMulter.single("image"), editSinglePost);
 
-postRoute.post("/:postId/like",validateToken,addLike)
-postRoute.delete("/:postId/:likeId",validateToken,removeLike)
+postRoute.delete("/:postId", deletePost);
 
-postRoute.put("/:postId",cloudinaryMulter.single("image"),editSinglePost)
+postRoute.post("/me", cloudinaryMulter.single("image"), validateToken, newPost);
 
-postRoute.delete("/:postId",deletePost)
-
-postRoute.post("/me",cloudinaryMulter.single("image"),validateToken,newPost)
-
-
-
-module.exports = postRoute
+module.exports = postRoute;
