@@ -16,7 +16,7 @@ userRouter.get("/me", validateToken, getUserProfile);
 userRouter.get("/", validateToken, getAllUsers);
 userRouter.get("/:userId", validateToken, getUserById);
 userRouter.put("/me/edit", validateToken, editUserProfile);
-userRouter.delete("/me/delete");
+userRouter.delete("/me/delete", validateToken);
 
 //Following
 
