@@ -30,4 +30,35 @@ const addFollowNotification = async (currentUser, followedUser) => {
 	return oldNotification;
 };
 
-module.exports = { addFollowNotification };
+const addPostNotification = async (
+	currentUser,
+	post,
+	like = false,
+	comment = false
+) => {
+	const notifyInfo = {
+		userId: currentUser._id,
+		postId: post._id,
+		like,
+		comment,
+
+		username: currentUser.username,
+	};
+
+	const oldNotification = await NotifyModel.findOne({
+		user: post.user,
+	});
+
+	if (!oldNotification) {
+		const newNotification = new NotifyModel({ user: post.user });
+		//notification.follows keeps the notification info which is currentUser
+		//Ex: 👨currentUser started following you ↔ (This notification goes to followed user's notification model)
+		newNotification.posts.push(notifyInfo);
+		return newNotification;
+	}
+
+	oldNotification.posts.push(notifyInfo);
+	return oldNotification;
+};
+
+module.exports = { addFollowNotification, addPostNotification };
