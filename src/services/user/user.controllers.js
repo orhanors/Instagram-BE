@@ -12,6 +12,41 @@ exports.getUserProfile = async (req, res, next) => {
 	}
 };
 
+exports.editUserProfile = async (req, res, next) => {
+	try {
+		const userId = req.user._id;
+
+		const editedProfile = await UserModel.findByIdAndUpdate(
+			userId,
+			{
+				$set: { ...req.body },
+			},
+			{ new: true }
+		);
+		if (!editedProfile) throw new ApiError(404, "User not found");
+
+		res.status(201).send(editedProfile);
+	} catch (error) {
+		console.log("user edit profile error: ", error);
+		next(error);
+	}
+};
+
+exports.deleteUserProfile = async (req, res, next) => {
+	try {
+		//TODO Delete also user related stuffs
+		const user = req.user;
+		const deletedProfile = await UserModel.findByIdAndDelete(user._id);
+
+		if (!deletedProfile) throw new ApiError(404, "User not found");
+
+		res.status(200).send("Successfuly deleted");
+	} catch (error) {
+		console.log("user delete error: ", error);
+		next(error);
+	}
+};
+
 exports.getAllUsers = async (req, res, next) => {
 	try {
 		const users = await UserModel.find({});
@@ -93,6 +128,43 @@ exports.unfollow = async (req, res, next) => {
 			.catch((e) => next(new ApiError()));
 	} catch (error) {
 		console.log("unfollow error: ", error);
+		next(error);
+	}
+};
+
+//NOTIFICATIONS
+exports.getNotifications = async (req, res, next) => {
+	try {
+		const userId = req.user._id;
+
+		const userNotifications = await NotifyModel.findOne({ user: userId });
+
+		if (!userNotifications)
+			throw new ApiError(404, "Notifications not found");
+
+		res.status(200).send(userNotifications);
+	} catch (error) {
+		console.log("get notification error: ", error);
+		next(error);
+	}
+};
+
+exports.changeNotificationSeen = async (req, res, next) => {
+	try {
+		const { notifyId } = req.params;
+		const notification = await NotifyModel.findOneAndUpdate(
+			{
+				_id: notifyId,
+			},
+			{ $set: { seen: true } },
+			{ new: true }
+		);
+
+		if (!notification) throw new ApiError(404, "Notification not found!");
+
+		res.status(201).send(notification);
+	} catch (error) {
+		console.log("change seen error: ", error);
 		next(error);
 	}
 };
