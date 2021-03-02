@@ -1,20 +1,19 @@
-const ObjectId = require('mongodb').ObjectID;
+const ObjectId = require("mongodb").ObjectID;
 const PostModel = require("./post.schema");
-
+const { addPostNotification } = require("../../utils/user/notify");
 exports.newPost = async (req, res, next) => {
 	try {
-		const userId = await req.user_id
-		console.log(req.user._id,"userId")
-		console.log(ObjectId(req.user._id),"objectId")
+		const userId = await req.user_id;
+		console.log(req.user._id, "userId");
+		console.log(ObjectId(req.user._id), "objectId");
 		const imgUrl = req.file.path;
-		const newPost = await PostModel({ 
-			user:ObjectId(req.user._id),
-			 image: imgUrl,
-			
-			  });
+		const newPost = await PostModel({
+			user: ObjectId(req.user._id),
+			image: imgUrl,
+		});
 		const { _id } = await newPost.save();
-		console.log(_id,"my id")
-		console.log("insidepost",req.user._id)
+		console.log(_id, "my id");
+		console.log("insidepost", req.user._id);
 		res.send(_id);
 	} catch (error) {
 		next(error);
@@ -34,10 +33,12 @@ exports.getSpecificPost = async (req, res, next) => {
 
 exports.getAllMyPosts = async (req, res, next) => {
 	try {
+
 		console.log(req.user._id)
         const myPosts = await PostModel.findOne({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
         console.log(myPosts,"asds")
 		res.send(myPosts)
+
 	} catch (error) {
 		next(error);
 	}
@@ -45,6 +46,7 @@ exports.getAllMyPosts = async (req, res, next) => {
 exports.getAllPosts = async (req, res, next) => {
 	try {
 		// first find my following ids
+
 		let allPosts = []
 		console.log(req.user.following,"here")
 		for(let i=0;i<req.user.following.length;i++){
@@ -53,10 +55,11 @@ exports.getAllPosts = async (req, res, next) => {
 		}
 		const myPosts = await PostModel.findOne({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
 		allPosts.push(myPosts)
+
 		//then find all the posts of them
 		// sort by date pending !!!!
 		// send the respond
-		
+
 		res.send(allPosts);
 	} catch (error) {
 		next(error);
@@ -100,75 +103,45 @@ exports.deletePost = async (req, res, next) => {
 	}
 };
 
-exports.addLike = async(req,res,next)=>{
+exports.handleLike = async (req, res, next) => {
 	try {
-		const findmyLike= await PostModel.findOne({_id:req.params.postId})
-		let liked=false
-		console.log(findmyLike,"asdsdas")
-		 for(let i = 0;i<findmyLike.likes.length;i++){
-			if(findmyLike.likes[i]._id===req.user._id){
-				liked=true
-				
-			}
+		const user = req.user;
 
+		const likeInfo = {
+			_id: user._id,
+			name: user.name,
+			surname: user.surname,
+			image: user.image,
+		};
+		const foundPost = await PostModel.findOne({ _id: req.params.postId });
+
+		const foundUserLike = foundPost.likes.find(
+			(like) => like._id.toString() === user._id.toString()
+		);
+
+		if (!foundUserLike) {
+			foundPost.likes.push(likeInfo);
+			const newNotification = await addPostNotification(
+				user,
+				foundPost,
+				true,
+				false
+			);
+
+			Promise.all([await foundPost.save(), await newNotification.save()])
+				.then((result) => res.status(200).send("Liked"))
+				.catch((e) => next(new ApiError()));
+
+			return;
 		}
-		if(liked===true){
-			const findPost = await PostModel.findByIdAndUpdate(req.params.postId,{
-				$push:{
-					likes:[
-						{
-							_id:req.user._id,
-							name:req.user.name,
-							surname:req.user.surname,
-							image:req.user.image
-						}
-					]
-				}
-				
-			},{runValidators:true,new:true,}
-			)
-			res.send(findPost)
-		}else{
-			const posts = await PostModel.findByIdAndUpdate(
-				req.params.postId,
-				{
-				  $pull: {
-					likes: {
-					  _id: req.user._id,
-					},
-				  },
-				},
-				{
-				  runValidators: true,
-				  new: true,
-				}
-			  );
-			  res.send(posts);
-		}
-		console.log(liked)
-		
+
+		foundPost.likes = foundPost.likes.filter(
+			(like) => like._id.toString() !== user._id.toString()
+		);
+
+		await foundPost.save();
+		res.status(200).send("Disliked");
 	} catch (error) {
-		next(error)
+		next(error);
 	}
-}
-exports.removeLike = async(req,res,next)=>{
-	try {
-		const posts = await PostModel.findByIdAndUpdate(
-			req.params.postId,
-			{
-			  $pull: {
-				likes: {
-				  _id: req.params.likeId,
-				},
-			  },
-			},
-			{
-			  runValidators: true,
-			  new: true,
-			}
-		  );
-		  res.send(posts);
-	} catch (error) {
-		next(error)
-	}
-}
+};
