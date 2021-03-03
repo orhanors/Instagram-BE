@@ -4,21 +4,41 @@ const { addMessageToDb } = require("../utils/message/message");
 
 const createSocketServer = (server) => {
 	const io = socketio(server);
-	const users = [];
+
 	io.on("connection", (socket) => {
 		console.log("New socket connection: ", socket.id);
-		socket.on("user_connected", (username) => {
-			console.log("user connected:: ", username);
-			users[username] = socket.id;
+		socket.on("join", (roomName) => {
+			console.log("new room: ", roomName);
+			let split = roomName.split("@"); // username1@username2 --> ["username1","username2"]
 
-			socket.emit("user_connected", username);
-		});
-		socket.on("send_message", async (data) => {
-			console.log("data is: ", data);
-			const socketId = users[data.receiver];
-			console.log("users::::", users);
-			socket.broadcast.to(socketId).emit("message_received", data);
-			await addMessageToDb(data);
+			let unique = [...new Set(split)].sort((a, b) => (a < b ? -1 : 1)); // ['username1', 'username2']
+
+			let updatedRoomName = `${unique[0]}@${unique[1]}`; // 'username1@username2'
+
+			Array.from(socket.rooms)
+				.filter((it) => it !== socket.id)
+				.forEach((id) => {
+					socket.leave(id);
+					socket.removeAllListeners(`emitMessage`);
+				});
+
+			socket.join(updatedRoomName);
+
+			socket.on("sendMessage", (message) => {
+				console.log("updated room: ", updatedRoomName);
+
+				io.to(updatedRoomName).emit("message", message);
+			});
+
+			socket.on("disconnect", () => {
+				console.log(socket.id + "--> disconnected");
+				socket.removeAllListeners();
+			});
+
+			socket.on("leaveRoom", (roomName) => {
+				console.log("room leaved");
+				socket.leave(roomName);
+			});
 		});
 	});
 };
