@@ -24,7 +24,7 @@ const startConversation = async (roomName, sender, socketId) => {
 			const senderUser = { id: sender, socketId };
 			newConversation.members.push(senderUser);
 			await newConversation.save();
-			return;
+			return newConversation;
 		}
 		const foundSender = await ConversationModel.findOne({
 			name: roomName,
@@ -41,6 +41,8 @@ const startConversation = async (roomName, sender, socketId) => {
 				throw new Error("Sender update failed");
 			}
 		}
+
+		return foundConv;
 	} catch (error) {
 		console.log("handle conversation err: ", error);
 	}
@@ -59,8 +61,41 @@ const findUserConversations = async (sender) => {
 		console.log("find user conversation err: ", error);
 	}
 };
+
+const getUserByConversation = async (roomName, socketId) => {
+	try {
+		const conversation = await ConversationModel.findOne({
+			name: roomName,
+		});
+
+		if (!conversation) {
+			throw new Error("Conversation not found");
+		}
+		const user = conversation.members.find(
+			(member) => member.socketId === socketId
+		);
+		return user;
+	} catch (error) {
+		console.log("get users by conversation err: ", error);
+	}
+};
+
+const addMessage = async (messageContent, roomName) => {
+	try {
+		const foundConv = await ConversationModel.findOne({ name: roomName });
+		if (!foundConv) {
+			throw new Error("No conversation found");
+		}
+		foundConv.messages.push(messageContent);
+		await foundConv.save();
+	} catch (error) {
+		console.log("Add message error: ", error);
+	}
+};
 module.exports = {
 	generateUniqueRoomName,
 	startConversation,
 	findUserConversations,
+	getUserByConversation,
+	addMessage,
 };
