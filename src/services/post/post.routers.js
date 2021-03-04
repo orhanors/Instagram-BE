@@ -6,6 +6,7 @@ const {
 	getAllMyPosts,
 	getAllPosts,
 	getSpecificPost,
+	getUserPosts,
 	deletePost,
 	editSinglePost,
 	handleLike,
@@ -17,6 +18,8 @@ postRoute.get("/:postId", getSpecificPost);
 
 
 postRoute.get("/all/me", validateToken, getAllMyPosts);
+
+postRoute.get("/all/:userId", validateToken, getUserPosts);
 
 postRoute.post("/:postId/like", validateToken, handleLike);
 
