@@ -5,7 +5,7 @@ const { generateTokens } = require("../../utils/auth/jwt");
 exports.refreshTokenHandler = async (req, res, next) => {
 	try {
 		const oldRefreshToken = req.cookies.refreshToken;
-		console.log("old token is: ", oldRefreshToken);
+
 		if (!oldRefreshToken)
 			throw new ApiError(400, "Refresh token is missing");
 		const newTokens = await handleRefreshToken(oldRefreshToken);

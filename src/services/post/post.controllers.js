@@ -3,17 +3,20 @@ const PostModel = require("./post.schema");
 const { addPostNotification } = require("../../utils/user/notify");
 exports.newPost = async (req, res, next) => {
 	try {
-		const userId = await req.user_id;
+		const userId = req.user._id;
 
 		const imgUrl = req.file.path;
-		const newPost = await PostModel({
-			user: ObjectId(req.user._id),
+
+		console.log("req.file: ::", req.body);
+		const newPost = new PostModel({
+			user: req.user._id,
 			image: imgUrl,
 		});
-		const { _id } = await newPost.save();
+		await newPost.save();
 
-		res.send(_id);
+		res.status(200).send(imgUrl);
 	} catch (error) {
+		console.log("new post image err: ", error);
 		next(error);
 	}
 };
@@ -24,8 +27,6 @@ exports.getSpecificPost = async (req, res, next) => {
 			.populate({ path: "comments", populate: { path: "user" } })
 			.populate("user");
 		res.status(200).send(specificPost);
-
-		console.log(specificPost);
 	} catch (error) {
 		next(error);
 	}
@@ -54,31 +55,30 @@ exports.getAllPosts = async (req, res, next) => {
 	try {
 		// first find my following ids
 
-		let followingPost = []
-		let allPosts = []
-		
-		console.log(req.user.following,"here")
-		for(let i=0;i<req.user.following.length;i++){
-			const post = await PostModel.find({user:req.user.following[i]}).populate("user").populate({path:"comments",populate:{path:"user"}})
-			followingPost.push(post)
-			
-			// im getting an array of posts of people I following 
+		let followingPost = [];
+		let allPosts = [];
+
+		for (let i = 0; i < req.user.following.length; i++) {
+			const post = await PostModel.find({ user: req.user.following[i] })
+				.populate("user")
+				.populate({ path: "comments", populate: { path: "user" } });
+			followingPost.push(post);
+
+			// im getting an array of posts of people I following
 		}
-		const myPosts = await PostModel.find({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
-		 myPosts.map((post)=>{
-			allPosts.push(post)
-		})
+		const myPosts = await PostModel.find({ user: req.user._id })
+			.populate("user")
+			.populate({ path: "comments", populate: { path: "user" } });
+		myPosts.map((post) => {
+			allPosts.push(post);
+		});
 		// im fucking smart :D
-		for(let i =0;i<followingPost.length;i++){
-			followingPost[i].forEach(element => {
-				allPosts.push(element)
-			
+		for (let i = 0; i < followingPost.length; i++) {
+			followingPost[i].forEach((element) => {
+				allPosts.push(element);
 			});
 		}
-		allPosts = allPosts.sort((a,b)=>b.createdAt - a.createdAt)
-		
-		
-	
+		allPosts = allPosts.sort((a, b) => b.createdAt - a.createdAt);
 
 		//then find all the posts of them
 		// sort by date pending !!!!

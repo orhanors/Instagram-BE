@@ -22,10 +22,15 @@ postRoute.get("/all/:userId", validateToken, getUserPosts);
 
 postRoute.post("/:postId/like", validateToken, handleLike);
 
-postRoute.put("/:postId", cloudinaryMulter.single("image"), editSinglePost);
+//postRoute.put("/:postId", cloudinaryMulter.single("image"), editSinglePost);
 
 postRoute.delete("/:postId", deletePost);
 
-postRoute.post("/me", cloudinaryMulter.single("image"), validateToken, newPost);
+postRoute.post(
+	"/image/upload",
+	cloudinaryMulter.single("post"),
+	validateToken,
+	newPost
+);
 
 module.exports = postRoute;
