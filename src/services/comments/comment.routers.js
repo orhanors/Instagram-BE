@@ -10,9 +10,9 @@ commentsRoute.get("/:postId",validateToken,getComments)
 
 commentsRoute.post("/:postId/add",validateToken,addComment)
 
-commentsRoute.put("/:commentId",validateToken,editComment)
+commentsRoute.put("/:postId/:commentId",validateToken,editComment)
 
-commentsRoute.delete("/:commentId",validateToken,deleteComment)
+commentsRoute.delete("/:postId/:commentId",validateToken,deleteComment)
 
 
 

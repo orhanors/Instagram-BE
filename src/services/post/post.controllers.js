@@ -55,22 +55,30 @@ exports.getAllPosts = async (req, res, next) => {
 		// first find my following ids
 		let followingPost = []
 		let allPosts = []
+		
 		console.log(req.user.following,"here")
 		for(let i=0;i<req.user.following.length;i++){
 			const post = await PostModel.find({user:req.user.following[i]}).populate("user").populate({path:"comments",populate:{path:"user"}})
 			followingPost.push(post)
 			
-			// im getting an array of posts of people I following
+			// im getting an array of posts of people I following 
 		}
 		const myPosts = await PostModel.find({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
 		 myPosts.map((post)=>{
 			allPosts.push(post)
 		})
-		followingPost[0].forEach(element => {
-			allPosts.push(element)
-		});
+		// im fucking smart :D
+		for(let i =0;i<followingPost.length;i++){
+			followingPost[i].forEach(element => {
+				allPosts.push(element)
+			
+			});
+		}
+		allPosts = allPosts.sort((a,b)=>b.createdAt - a.createdAt)
+		
+		
 	
-		console.log(myPosts)
+		
 		//then find all the posts of them
 		// sort by date pending !!!!
 		// send the respond
