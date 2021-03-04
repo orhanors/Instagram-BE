@@ -11,7 +11,7 @@ const createSocketServer = (server) => {
 	const io = socketio(server);
 
 	io.on("connection", (socket) => {
-		console.log("New socket connection: ", socket.id);
+		//console.log("New socket connection: ", socket.id);
 
 		socket.on("startMessaging", async ({ sender }) => {
 			try {

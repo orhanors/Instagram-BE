@@ -24,7 +24,7 @@ const generateTokens = async (user) => {
 const handleRefreshToken = async (oldRefreshToken) => {
 	//check if the old token is valid
 	const decoded = await verifyRefreshToken(oldRefreshToken);
-	console.log(decoded);
+
 	//jwt.verify returns payload. We can check the user existince with _id
 	const user = await UserModel.findOne({ _id: decoded._id });
 
