@@ -5,7 +5,7 @@ const { generateTokens } = require("../../utils/auth/jwt");
 exports.refreshTokenHandler = async (req, res, next) => {
 	try {
 		const oldRefreshToken = req.cookies.refreshToken;
-
+		console.log("old token is: ", oldRefreshToken);
 		if (!oldRefreshToken)
 			throw new ApiError(400, "Refresh token is missing");
 		const newTokens = await handleRefreshToken(oldRefreshToken);
@@ -40,10 +40,11 @@ exports.login = async (req, res, next) => {
 		const user = await UserModel.findByCredentials(username, password);
 		if (!user) return next(new ApiError(400, "Invalid Credentials"));
 		const tokens = await generateTokens(user);
+
 		res.cookie("token", tokens.token, { httpOnly: true });
-		res.cookie("refreshTok5en", tokens.refreshToken, {
+		res.cookie("refreshToken", tokens.refreshToken, {
 			httpOnly: true,
-			path: "/api/users/refreshToken",
+			path: "/api/auth/refreshToken",
 		});
 		res.cookie("isAuthUser", true);
 		res.status(200).send("Ok");

@@ -1,45 +1,76 @@
 const socketio = require("socket.io");
-
-const { addMessageToDb } = require("../utils/message/message");
-
+const {
+	generateUniqueRoomName,
+	startConversation,
+	updateUserSocketId,
+	getUserByConversation,
+	addMessage,
+	findUserConversations,
+} = require("../utils/messaging/conversation");
 const createSocketServer = (server) => {
 	const io = socketio(server);
 
 	io.on("connection", (socket) => {
-		console.log("New socket connection: ", socket.id);
-		socket.on("join", (roomName) => {
-			console.log("new room: ", roomName);
-			let split = roomName.split("@"); // username1@username2 --> ["username1","username2"]
+		//console.log("New socket connection: ", socket.id);
 
-			let unique = [...new Set(split)].sort((a, b) => (a < b ? -1 : 1)); // ['username1', 'username2']
+		socket.on("startMessaging", async ({ sender }) => {
+			try {
+				//data:{sender}
+				console.log("💆 messagin started....");
+				//Update user socket id in DB
+				await updateUserSocketId(sender, socket.id);
 
-			let updatedRoomName = `${unique[0]}@${unique[1]}`; // 'username1@username2'
+				//find all conversations that I am in the participants array
+				const userConversations = await findUserConversations(sender);
 
-			Array.from(socket.rooms)
-				.filter((it) => it !== socket.id)
-				.forEach((id) => {
-					socket.leave(id);
-					socket.removeAllListeners(`emitMessage`);
+				//we join all the rooms to listen possible message events
+				userConversations.map((conversation) => {
+					socket.join(conversation.id);
 				});
-
-			socket.join(updatedRoomName);
-
-			socket.on("sendMessage", (message) => {
-				console.log("updated room: ", updatedRoomName);
-
-				io.to(updatedRoomName).emit("message", message);
-			});
-
-			socket.on("disconnect", () => {
-				console.log(socket.id + "--> disconnected");
-				socket.removeAllListeners();
-			});
-
-			socket.on("leaveRoom", (roomName) => {
-				console.log("room leaved");
-				socket.leave(roomName);
-			});
+			} catch (error) {
+				console.log(error);
+			}
 		});
+		socket.on("joinConversation", async (data) => {
+			try {
+				console.log(" 🔰 Joined conversation ", data.sender);
+				const roomName = generateUniqueRoomName(
+					data.sender,
+					data.receiver
+				);
+				const conversation = await startConversation(
+					roomName,
+					data.sender,
+					socket.id
+				);
+
+				socket.join(roomName);
+
+				conversation.members.map((member) => {
+					io.sockets.connected[member.socketId].join(
+						conversation._id
+					);
+				});
+			} catch (error) {
+				console.log(error);
+			}
+		});
+		socket.on("privateMessage", async (data) => {
+			// data: sender,receiver,msg
+			const { sender, receiver, msg } = data;
+			const roomName = generateUniqueRoomName(sender, receiver);
+			const user = await getUserByConversation(roomName, socket.id);
+			const messageContent = {
+				msg,
+				sender,
+				receiver,
+			};
+			console.log("messge is: ", messageContent);
+			await addMessage(messageContent, roomName);
+			io.to(roomName).emit("message", messageContent);
+		});
+
+		//socket.on("leaveConversation",async())
 	});
 };
 

@@ -16,13 +16,11 @@ const {
 postRoute.get("/all/me/posts", validateToken, getAllPosts);
 postRoute.get("/:postId", getSpecificPost);
 
-
 postRoute.get("/all/me", validateToken, getAllMyPosts);
 
 postRoute.get("/all/:userId", validateToken, getUserPosts);
 
 postRoute.post("/:postId/like", validateToken, handleLike);
-
 
 postRoute.put("/:postId", cloudinaryMulter.single("image"), editSinglePost);
 

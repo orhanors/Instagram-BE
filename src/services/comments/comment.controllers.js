@@ -1,20 +1,22 @@
-const CommentModel = require("./comment.schema")
-const PostModel = require("../post/post.schema")
-const ObjectId = require('mongodb').ObjectID;
-exports.getComments = async(req,res,next)=>{
-    try {
-        const comments = await CommentModel.find().populate("User")
+const CommentModel = require("./comment.schema");
+const PostModel = require("../post/post.schema");
+const ObjectId = require("mongodb").ObjectID;
+exports.getComments = async (req, res, next) => {
+	try {
+		const comments = await CommentModel.find().populate("User");
 
-        if(comments.length > 0){
-            res.status(200).send(comments)
-        }else{
-            res.status(404).send("404 not found or you dont have any comments")
-        }
+		if (comments.length > 0) {
+			res.status(200).send(comments);
+		} else {
+			res.status(404).send("404 not found or you dont have any comments");
+		}
+	} catch (error) {
+		next(error);
+	}
+};
 
-    } catch (error) {
-        next(error)
-    }
-}
+
+
 
 exports.deleteComment = async(req,res,next)=>{
     try {
@@ -67,3 +69,4 @@ exports.addComment = async(req,res,next)=>{
         next(error)
     }
 }
+
