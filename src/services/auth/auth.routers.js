@@ -26,6 +26,6 @@ authRouter.get(
 	"/facebookRedirect",
 	passport.authenticate("facebook"),
 	handleTokens
-)
+);
 
 module.exports = authRouter;

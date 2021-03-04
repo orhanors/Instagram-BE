@@ -24,16 +24,16 @@ const generateTokens = async (user) => {
 const handleRefreshToken = async (oldRefreshToken) => {
 	//check if the old token is valid
 	const decoded = await verifyRefreshToken(oldRefreshToken);
-
+	console.log(decoded);
 	//jwt.verify returns payload. We can check the user existince with _id
 	const user = await UserModel.findOne({ _id: decoded._id });
 
 	if (!user) throw new ApiError(403, "Access is forbidden");
-	console.log("user.refreshtokens: ", user.refreshTokens);
+
 	const currentRefreshToken = user.refreshTokens.find(
 		(t) => t.token === oldRefreshToken
 	);
-	console.log("current token is: ", currentRefreshToken);
+
 	if (!currentRefreshToken)
 		throw new ApiError(403, "Refresh token is missing or invalid");
 
@@ -48,7 +48,7 @@ const handleRefreshToken = async (oldRefreshToken) => {
 
 const generateJWT = (payload) =>
 	new Promise((res, rej) => {
-		jwt.sign(payload, JWT_SECRET, { expiresIn: "55m" }, (err, token) => {
+		jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" }, (err, token) => {
 			if (err) rej(err);
 			res(token);
 		});

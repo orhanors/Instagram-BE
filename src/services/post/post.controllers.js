@@ -4,16 +4,14 @@ const { addPostNotification } = require("../../utils/user/notify");
 exports.newPost = async (req, res, next) => {
 	try {
 		const userId = await req.user_id;
-		console.log(req.user._id, "userId");
-		console.log(ObjectId(req.user._id), "objectId");
+
 		const imgUrl = req.file.path;
 		const newPost = await PostModel({
 			user: ObjectId(req.user._id),
 			image: imgUrl,
 		});
 		const { _id } = await newPost.save();
-		console.log(_id, "my id");
-		console.log("insidepost", req.user._id);
+
 		res.send(_id);
 	} catch (error) {
 		next(error);
@@ -22,7 +20,9 @@ exports.newPost = async (req, res, next) => {
 
 exports.getSpecificPost = async (req, res, next) => {
 	try {
-		const specificPost = await PostModel.findById(req.params.postId).populate({path:"comments",populate:{path:"user"}}).populate("user");
+		const specificPost = await PostModel.findById(req.params.postId)
+			.populate({ path: "comments", populate: { path: "user" } })
+			.populate("user");
 		res.status(200).send(specificPost);
 
 		console.log(specificPost);
@@ -31,21 +31,21 @@ exports.getSpecificPost = async (req, res, next) => {
 	}
 };
 exports.getUserPosts = async (req, res, next) => {
-	try{
-		const result = await PostModel.find({user: req.params.userId});
-		res.send(result)
-	} catch(err){
-		next(err)
+	try {
+		const result = await PostModel.find({ user: req.params.userId });
+		res.send(result);
+	} catch (err) {
+		next(err);
 	}
-}
+};
 exports.getAllMyPosts = async (req, res, next) => {
 	try {
+		console.log(req.user._id);
+		const myPosts = await PostModel.find({ user: req.user._id })
+			.populate("user")
+			.populate({ path: "comments", populate: { path: "user" } });
 
-		console.log(req.user._id)
-        const myPosts = await PostModel.find({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
-        console.log(myPosts,"asds")
-		res.send(myPosts)
-
+		res.send(myPosts);
 	} catch (error) {
 		next(error);
 	}
@@ -53,24 +53,27 @@ exports.getAllMyPosts = async (req, res, next) => {
 exports.getAllPosts = async (req, res, next) => {
 	try {
 		// first find my following ids
-		let followingPost = []
-		let allPosts = []
-		console.log(req.user.following,"here")
-		for(let i=0;i<req.user.following.length;i++){
-			const post = await PostModel.find({user:req.user.following[i]}).populate("user").populate({path:"comments",populate:{path:"user"}})
-			followingPost.push(post)
-			
+		let followingPost = [];
+		let allPosts = [];
+
+		for (let i = 0; i < req.user.following.length; i++) {
+			const post = await PostModel.find({ user: req.user.following[i] })
+				.populate("user")
+				.populate({ path: "comments", populate: { path: "user" } });
+			followingPost.push(post);
+
 			// im getting an array of posts of people I following
 		}
-		const myPosts = await PostModel.find({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
-		 myPosts.map((post)=>{
-			allPosts.push(post)
-		})
-		followingPost[0].forEach(element => {
-			allPosts.push(element)
+		const myPosts = await PostModel.find({ user: req.user._id })
+			.populate("user")
+			.populate({ path: "comments", populate: { path: "user" } });
+		myPosts.map((post) => {
+			allPosts.push(post);
 		});
-	
-		console.log(myPosts)
+		followingPost[0].forEach((element) => {
+			allPosts.push(element);
+		});
+
 		//then find all the posts of them
 		// sort by date pending !!!!
 		// send the respond
