@@ -30,7 +30,14 @@ exports.getSpecificPost = async (req, res, next) => {
 		next(error);
 	}
 };
-
+exports.getUserPosts = async (req, res, next) => {
+	try{
+		const result = await PostModel.find({user: req.params.userId});
+		res.send(result)
+	} catch(err){
+		next(err)
+	}
+}
 exports.getAllMyPosts = async (req, res, next) => {
 	try {
 
