@@ -42,7 +42,7 @@ exports.getAllMyPosts = async (req, res, next) => {
 	try {
 
 		console.log(req.user._id)
-        const myPosts = await PostModel.findOne({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
+        const myPosts = await PostModel.find({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
         console.log(myPosts,"asds")
 		res.send(myPosts)
 
@@ -53,16 +53,24 @@ exports.getAllMyPosts = async (req, res, next) => {
 exports.getAllPosts = async (req, res, next) => {
 	try {
 		// first find my following ids
-
+		let followingPost = []
 		let allPosts = []
 		console.log(req.user.following,"here")
 		for(let i=0;i<req.user.following.length;i++){
 			const post = await PostModel.find({user:req.user.following[i]}).populate("user").populate({path:"comments",populate:{path:"user"}})
-			allPosts.push(post)
+			followingPost.push(post)
+			
+			// im getting an array of posts of people I following
 		}
-		const myPosts = await PostModel.findOne({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
-		allPosts.push(myPosts)
-
+		const myPosts = await PostModel.find({user:req.user._id}).populate("user").populate({path:"comments",populate:{path:"user"}})
+		 myPosts.map((post)=>{
+			allPosts.push(post)
+		})
+		followingPost[0].forEach(element => {
+			allPosts.push(element)
+		});
+	
+		console.log(myPosts)
 		//then find all the posts of them
 		// sort by date pending !!!!
 		// send the respond

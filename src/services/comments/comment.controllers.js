@@ -16,7 +16,25 @@ exports.getComments = async(req,res,next)=>{
     }
 }
 
-
+exports.deleteComment = async(req,res,next)=>{
+    try {
+        const deleteComment = await CommentModel.findByIdAndDelete(req.params.commentId)
+        res.status(204).send("Deleted")
+    } catch (error) {
+        next(error)   
+    }
+}
+exports.editComment = async(req,res,next)=>{
+    const editedComment = await CommentModel.findByIdAndUpdate(
+        req.params.commentId,
+        req.body,
+        {
+            runValidators:true,
+            new:true,
+        }
+    )
+    res.status(200).send(editedComment._id)
+}
 exports.addComment = async(req,res,next)=>{
     try{
         const newComment = new CommentModel({
