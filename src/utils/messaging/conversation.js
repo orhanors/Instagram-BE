@@ -32,14 +32,24 @@ const startConversation = async (roomName, sender, socketId) => {
 		});
 
 		if (!foundSender) {
-			const updatedSender = await ConversationModel.findOneAndUpdate(
+			// if user is not exist,let's add it to the members
+			const updatedConversation = await ConversationModel.findOneAndUpdate(
 				{ name: roomName },
 				{ $addToSet: { members: { id: sender, socketId } } },
 				{ new: true }
 			);
-			if (!updatedSender) {
+			if (!updatedConversation) {
 				throw new Error("Sender update failed");
+			} else {
+				return updatedConversation;
 			}
+		} else {
+			// if user is already in room let's update sockedId
+			const updatedSender = await ConversationModel.findOneAndUpdate(
+				{ name: roomName, "members.id": sender },
+				{ "members.$.socketId": socketId },
+				{ new: true }
+			);
 		}
 
 		return foundConv;
@@ -48,17 +58,35 @@ const startConversation = async (roomName, sender, socketId) => {
 	}
 };
 
+const updateUserSocketId = async (sender, socketId) => {
+	try {
+		const foundConversations = await ConversationModel.updateMany(
+			{
+				"members.id": sender,
+			},
+			{ "members.$.socketId": socketId }
+		);
+
+		if (!foundConversations) {
+			throw new Error("User conversation found error");
+		}
+	} catch (error) {
+		console.log("find user conversation err: ", error);
+	}
+};
+
 const findUserConversations = async (sender) => {
 	try {
 		const foundConversations = await ConversationModel.find({
 			"members.id": sender,
 		});
+
 		if (!foundConversations) {
 			throw new Error("User conversation found error");
 		}
 		return foundConversations;
 	} catch (error) {
-		console.log("find user conversation err: ", error);
+		console.log("find user conv err: ", error);
 	}
 };
 
@@ -95,7 +123,8 @@ const addMessage = async (messageContent, roomName) => {
 module.exports = {
 	generateUniqueRoomName,
 	startConversation,
-	findUserConversations,
+	updateUserSocketId,
 	getUserByConversation,
 	addMessage,
+	findUserConversations,
 };
