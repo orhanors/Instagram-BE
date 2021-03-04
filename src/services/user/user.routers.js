@@ -1,5 +1,5 @@
 const userRouter = require("express").Router();
-
+const cloudinaryMulter = require("../../middlewares/cloudinary");
 const { validateToken } = require("../../middlewares/validateToken");
 const {
 	getUserProfile,
@@ -15,7 +15,7 @@ const {
 userRouter.get("/me", validateToken, getUserProfile);
 userRouter.get("/", validateToken, getAllUsers);
 userRouter.get("/:userId", validateToken, getUserById);
-userRouter.put("/me/edit", validateToken, editUserProfile);
+userRouter.put("/me/edit", cloudinaryMulter.single("image"), validateToken, editUserProfile);
 userRouter.delete("/me/delete", validateToken);
 
 //Following

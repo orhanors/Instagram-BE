@@ -15,7 +15,19 @@ exports.getUserProfile = async (req, res, next) => {
 exports.editUserProfile = async (req, res, next) => {
 	try {
 		const userId = req.user._id;
-
+		console.log(req.file.path);
+		if (req.file && req.file.path){
+			const editProfile = await UserModel.findByIdAndUpdate(
+				userId,
+				{
+					$set: {
+						image: req.file.path
+					}
+				}
+			);
+			const { _id } = await editProfile.save();
+			res.status(201).send(_id);
+		} else {
 		const editedProfile = await UserModel.findByIdAndUpdate(
 			userId,
 			{
@@ -26,6 +38,7 @@ exports.editUserProfile = async (req, res, next) => {
 		if (!editedProfile) throw new ApiError(404, "User not found");
 
 		res.status(201).send(editedProfile);
+		}
 	} catch (error) {
 		console.log("user edit profile error: ", error);
 		next(error);
