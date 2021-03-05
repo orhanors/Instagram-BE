@@ -12,6 +12,7 @@ const {
 	changeNotificationSeen,
 	editUserProfile,
 	editUserImage,
+	getUserByUsername,
 } = require("./user.controllers");
 
 userRouter.get("/me", validateToken, getUserProfile);
@@ -25,7 +26,7 @@ userRouter.delete("/me/delete", validateToken);
 userRouter.post("/follow/:followedUserId", validateToken, follow);
 
 userRouter.delete("/unfollow/:unfollowedUserId", validateToken, unfollow);
-
+userRouter.get("/user/:username", validateToken, getUserByUsername);
 //Notification
 userRouter.get("/notifications/show", validateToken, getNotifications);
 userRouter.put(
@@ -34,10 +35,11 @@ userRouter.put(
 	changeNotificationSeen
 );
 
-userRouter.put("/me/update/image", 
-cloudinaryMulter.single("image"),
-validateToken, 
-editUserImage
-)
+userRouter.put(
+	"/me/update/image",
+	cloudinaryMulter.single("image"),
+	validateToken,
+	editUserImage
+);
 
 module.exports = userRouter;
