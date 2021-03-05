@@ -1,4 +1,5 @@
 const userRouter = require("express").Router();
+const cloudinaryMulter = require("../../middlewares/cloudinary");
 
 const { validateToken } = require("../../middlewares/validateToken");
 const {
@@ -10,6 +11,8 @@ const {
 	getNotifications,
 	changeNotificationSeen,
 	editUserProfile,
+	editUserImage,
+	getUserByUsername,
 } = require("./user.controllers");
 
 userRouter.get("/me", validateToken, getUserProfile);
@@ -23,13 +26,20 @@ userRouter.delete("/me/delete", validateToken);
 userRouter.post("/follow/:followedUserId", validateToken, follow);
 
 userRouter.delete("/unfollow/:unfollowedUserId", validateToken, unfollow);
-
+userRouter.get("/user/:username", validateToken, getUserByUsername);
 //Notification
 userRouter.get("/notifications/show", validateToken, getNotifications);
 userRouter.put(
 	"/notification/change/seen",
 	validateToken,
 	changeNotificationSeen
+);
+
+userRouter.put(
+	"/me/update/image",
+	cloudinaryMulter.single("image"),
+	validateToken,
+	editUserImage
 );
 
 module.exports = userRouter;
