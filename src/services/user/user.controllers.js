@@ -32,6 +32,28 @@ exports.editUserProfile = async (req, res, next) => {
 	}
 };
 
+exports.editUserImage = async(req, res, next) => {
+	try{
+		const userId = req.user._id;
+		const imgUrl = req.file.path;
+		const editedProfile = await UserModel.findByIdAndUpdate(
+			userId,
+			{
+				$set: { 
+					image: imgUrl,
+				 },
+			},
+			{ new: true }
+		);
+		if (!editedProfile) throw new ApiError(404, "User not found");
+
+		res.status(201).send(editedProfile);
+	} catch(error){
+		console.log("user edit image error: ", error);
+		next(error);
+	}
+}
+
 exports.deleteUserProfile = async (req, res, next) => {
 	try {
 		//TODO Delete also user related stuffs
