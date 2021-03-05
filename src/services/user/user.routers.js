@@ -1,4 +1,5 @@
 const userRouter = require("express").Router();
+const cloudinaryMulter = require("../../middlewares/cloudinary");
 
 const { validateToken } = require("../../middlewares/validateToken");
 const {
@@ -10,6 +11,7 @@ const {
 	getNotifications,
 	changeNotificationSeen,
 	editUserProfile,
+	editUserImage,
 } = require("./user.controllers");
 
 userRouter.get("/me", validateToken, getUserProfile);
@@ -31,5 +33,11 @@ userRouter.put(
 	validateToken,
 	changeNotificationSeen
 );
+
+userRouter.put("/me/update/image", 
+cloudinaryMulter.single("image"),
+validateToken, 
+editUserImage
+)
 
 module.exports = userRouter;
