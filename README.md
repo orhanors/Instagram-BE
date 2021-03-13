@@ -1,6 +1,6 @@
 # Instagram Web Clone Backend
 
-Instagram web clone is a web application which is implemented using NodeJs,ExpressJs,PassportJs,JWT and MongoDB. Frontend side of this project can be found [here](https://github.com/orhanors/Instagram-FE)
+Instagram web clone is a web application which is implemented using NodeJs,ExpressJs,PassportJs,JWT and MongoDB. Frontend side of this project can be found [here](https://github.com/orhanors/Instagram-FE/)
 
 Under the [services](https://github.com/orhanors/Instagram-BE/tree/master/src/services) folder you can find the services that is implemented for this project
 
