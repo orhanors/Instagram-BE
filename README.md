@@ -89,7 +89,7 @@ with user2 they will join same room and user2 won't be able to create same room 
 <summary><b> Post </b></summary>
 
 <p> Users are able to upload image posts with a description</p>
-<p> Cloudinary is used for image uploading. Here is the middleware implementation of cloudinary: </p>
+<p> Cloudinary is used for image uploading. Here is the middleware implementation of cloudinary:  </p>
 
 ```javascript
 cloudinary.config({
