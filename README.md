@@ -201,3 +201,9 @@ onst NotificationSchema = new mongoose.Schema({
 ```
 </details>
 
+### Deployment
+
+<details>
+<summary><b> Azure DevOps Pipeline </b></summary>
+	<p> Deployed on Azure Web Apps Service. Also created DevOps pipeline but it doesn't contain tests. Next feature will be implementation of Unit and Integration tests </p>
+</details>
